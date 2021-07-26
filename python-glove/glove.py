@@ -2,7 +2,7 @@ import logging
 import os
 import subprocess
 
-from keyedvectors import KeyedVectors
+from .keyedvectors import KeyedVectors
 
 logger = logging.getLogger(__name__)
 dirname = os.path.dirname(__file__)
@@ -106,8 +106,3 @@ class Glove:
     def clean(self):
         for file in os.listdir(tmppath):
             os.remove(os.path.join(tmppath, file))
-
-
-model = Glove(corpus_file='corpus.txt')
-print(model.wv.vectors)
-print(model.wv.index_to_key)
