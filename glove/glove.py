@@ -64,11 +64,12 @@ class Glove:
         logging.info(result.stderr.decode().strip())
 
     def cooccur(self, corpus_iterable=None, corpus_file=None):
+        vocab_file = os.path.join(tmppath, 'vocab.txt')
         cooccurrence_file = os.path.join(tmppath, 'cooccurrence.bin')
         excute = os.path.join(dirname, 'build/cooccur')
 
         cli = '{} -window-size {} -vocab-file {}'.format(
-            excute, self.window, 'vocab.txt').split()
+            excute, self.window, vocab_file).split()
         if corpus_iterable is not None:
             result = subprocess.run(cli,
                                     input=corpus_iterable.encode(),
