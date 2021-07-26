@@ -46,9 +46,10 @@ class Glove:
 
     def build_vocab(self, corpus_iterable=None, corpus_file=None):
         vocab_file = os.path.join(tmppath, 'vocab.txt')
+        excute = os.path.join(dirname, 'build/vocab_count')
 
-        cli = 'build/vocab_count -max-vocab {} -min-count {}'.format(
-            self.max_vocab, self.min_count).split()
+        cli = '{} -max-vocab {} -min-count {}'.format(
+            excute, self.max_vocab, self.min_count).split()
         if corpus_iterable is not None:
             result = subprocess.run(cli,
                                     input=corpus_iterable.encode(),
@@ -64,9 +65,10 @@ class Glove:
 
     def cooccur(self, corpus_iterable=None, corpus_file=None):
         cooccurrence_file = os.path.join(tmppath, 'cooccurrence.bin')
+        excute = os.path.join(dirname, 'build/cooccur')
 
-        cli = 'build/cooccur -window-size {} -vocab-file {}'.format(
-            self.window, 'vocab.txt').split()
+        cli = '{} -window-size {} -vocab-file {}'.format(
+            excute, self.window, 'vocab.txt').split()
         if corpus_iterable is not None:
             result = subprocess.run(cli,
                                     input=corpus_iterable.encode(),
@@ -82,8 +84,9 @@ class Glove:
     def shuffle(self):
         cooccurrence_file = os.path.join(tmppath, 'cooccurrence.bin')
         cooccurrence_shuf_file = os.path.join(tmppath, 'cooccurrence.shuf.bin')
+        excute = os.path.join(dirname, 'build/shuffle')
 
-        cli = 'build/shuffle -seed {}'.format(self.seed).split()
+        cli = '{} -seed {}'.format(excute, self.seed).split()
         result = subprocess.run(cli,
                                 input=open(cooccurrence_file, 'rb').read(),
                                 stdout=open(cooccurrence_shuf_file, 'wb'),
@@ -94,11 +97,10 @@ class Glove:
         vocab_file = os.path.join(tmppath, 'vocab.txt')
         vector_file = os.path.join(tmppath, 'vector')
         cooccurrence_shuf_file = os.path.join(tmppath, 'cooccurrence.shuf.bin')
+        excute = os.path.join(dirname, 'build/glove')
 
-        cli = 'build/glove -vector-size {} -threads {} -iter {} \
-            -input-file {} -vocab-file {} -save-file {} -seed {}'.format(
-            self.vector_size, self.workers, self.epochs,
-            cooccurrence_shuf_file, vocab_file, vector_file, self.seed).split()
+        cli = '{} -vector-size {} -threads {} -iter {} -input-file {} -vocab-file {} -save-file {} -seed {}'.format(
+            excute, self.vector_size, self.workers, self.epochs, cooccurrence_shuf_file, vocab_file, vector_file, self.seed).split()
 
         result = subprocess.run(cli, stderr=subprocess.PIPE)
         logging.info(result.stderr.decode().strip())
