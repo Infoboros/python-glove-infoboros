@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 from setuptools import setup
@@ -6,7 +7,31 @@ from setuptools.command.install import install
 
 class CustomInstall(install):
     def run(self):
-        subprocess.check_call(['make'], cwd='glove', shell=True)
+        CC = 'gcc'
+        CFLAGS = '-lm -pthread -O3 -march=native -funroll-loops -Wall -Wextra -Wpedantic'
+        BUILDDIR = 'glove/build'
+        SRCDIR = 'glove/src'
+
+        os.makedirs(BUILDDIR, exist_ok=True)
+        subprocess.check_call(
+            [CC, '-c', SRCDIR+'/common.c', '-o', BUILDDIR+'/common.o'] + CFLAGS.split())
+        subprocess.check_call(
+            [CC, '-c', SRCDIR+'/vocab_count.c', '-o', BUILDDIR+'/vocab_count.o'] + CFLAGS.split())
+        subprocess.check_call(
+            [CC, '-c', SRCDIR+'/cooccur.c', '-o', BUILDDIR+'/cooccur.o'] + CFLAGS.split())
+        subprocess.check_call(
+            [CC, '-c', SRCDIR+'/shuffle.c', '-o', BUILDDIR+'/shuffle.o'] + CFLAGS.split())
+        subprocess.check_call(
+            [CC, '-c', SRCDIR+'/glove.c', '-o', BUILDDIR+'/glove.o'] + CFLAGS.split())
+
+        subprocess.check_call(
+            [CC, BUILDDIR+'/vocab_count.o', BUILDDIR+'/common.o', '-o', BUILDDIR+'/vocab_count'] + CFLAGS.split())
+        subprocess.check_call(
+            [CC, BUILDDIR+'/cooccur.o', BUILDDIR+'/common.o', '-o', BUILDDIR+'/cooccur'] + CFLAGS.split())
+        subprocess.check_call(
+            [CC, BUILDDIR+'/shuffle.o', BUILDDIR+'/common.o', '-o', BUILDDIR+'/shuffle'] + CFLAGS.split())
+        subprocess.check_call(
+            [CC, BUILDDIR+'/glove.o', BUILDDIR+'/common.o', '-o', BUILDDIR+'/glove'] + CFLAGS.split())
         super().run()
 
 
