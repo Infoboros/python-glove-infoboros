@@ -21,7 +21,8 @@ class Glove:
         min_count=5,
         seed=42,
         workers=4,
-        epochs=10
+        epochs=10,
+        verbose=False,
     ):
         self.clean()
         self.vector_size = vector_size
@@ -31,6 +32,7 @@ class Glove:
         self.seed = seed
         self.workers = workers
         self.epochs = epochs
+        self.verbose = verbose
 
         corpus_iterable = sentences
         if corpus_iterable is not None:
@@ -51,17 +53,16 @@ class Glove:
         cli = '{} -max-vocab {} -min-count {}'.format(
             excute, self.max_vocab, self.min_count).split()
         if corpus_iterable is not None:
-            result = subprocess.run(cli,
-                                    input=corpus_iterable.encode(),
-                                    stdout=open(vocab_file, 'w'),
-                                    stderr=subprocess.PIPE)
+            subprocess.run(cli,
+                           input=corpus_iterable.encode(),
+                           stdout=open(vocab_file, 'w'),
+                           stderr=None if self.verbose else subprocess.PIPE)
 
         if corpus_file is not None:
-            result = subprocess.run(cli,
-                                    input=open(corpus_file, 'rb').read(),
-                                    stdout=open(vocab_file, 'w'),
-                                    stderr=subprocess.PIPE)
-        logging.info(result.stderr.decode().strip())
+            subprocess.run(cli,
+                           input=open(corpus_file, 'rb').read(),
+                           stdout=open(vocab_file, 'w'),
+                           stderr=None if self.verbose else subprocess.PIPE)
 
     def cooccur(self, corpus_iterable=None, corpus_file=None):
         vocab_file = os.path.join(tmppath, 'vocab.txt')
@@ -71,16 +72,15 @@ class Glove:
         cli = '{} -window-size {} -vocab-file {}'.format(
             excute, self.window, vocab_file).split()
         if corpus_iterable is not None:
-            result = subprocess.run(cli,
-                                    input=corpus_iterable.encode(),
-                                    stdout=open(cooccurrence_file, 'wb'),
-                                    stderr=subprocess.PIPE)
+            subprocess.run(cli,
+                           input=corpus_iterable.encode(),
+                           stdout=open(cooccurrence_file, 'wb'),
+                           stderr=None if self.verbose else subprocess.PIPE)
         if corpus_file is not None:
-            result = subprocess.run(cli,
-                                    input=open(corpus_file, 'rb').read(),
-                                    stdout=open(cooccurrence_file, 'wb'),
-                                    stderr=subprocess.PIPE)
-        logging.info(result.stderr.decode().strip())
+            subprocess.run(cli,
+                           input=open(corpus_file, 'rb').read(),
+                           stdout=open(cooccurrence_file, 'wb'),
+                           stderr=None if self.verbose else subprocess.PIPE)
 
     def shuffle(self):
         cooccurrence_file = os.path.join(tmppath, 'cooccurrence.bin')
@@ -88,11 +88,10 @@ class Glove:
         excute = os.path.join(dirname, 'build/shuffle')
 
         cli = '{} -seed {}'.format(excute, self.seed).split()
-        result = subprocess.run(cli,
-                                input=open(cooccurrence_file, 'rb').read(),
-                                stdout=open(cooccurrence_shuf_file, 'wb'),
-                                stderr=subprocess.PIPE)
-        logging.info(result.stderr.decode().strip())
+        subprocess.run(cli,
+                       input=open(cooccurrence_file, 'rb').read(),
+                       stdout=open(cooccurrence_shuf_file, 'wb'),
+                       stderr=None if self.verbose else subprocess.PIPE)
 
     def train(self):
         vocab_file = os.path.join(tmppath, 'vocab.txt')
@@ -103,8 +102,7 @@ class Glove:
         cli = '{} -vector-size {} -threads {} -iter {} -input-file {} -vocab-file {} -save-file {} -seed {}'.format(
             excute, self.vector_size, self.workers, self.epochs, cooccurrence_shuf_file, vocab_file, vector_file, self.seed).split()
 
-        result = subprocess.run(cli, stderr=subprocess.PIPE)
-        logging.info(result.stderr.decode().strip())
+        subprocess.run(cli, stderr=None if self.verbose else subprocess.PIPE)
 
     def clean(self):
         for file in os.listdir(tmppath):
