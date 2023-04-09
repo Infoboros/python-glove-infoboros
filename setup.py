@@ -8,7 +8,7 @@ from setuptools.command.install import install
 class CustomInstall(install):
     def run(self):
         CC = 'gcc'
-        CFLAGS = '-lm -pthread -O3 -march=native -funroll-loops -Wall -Wextra -Wpedantic'
+        CFLAGS = '-lm -pthread -O3 -funroll-loops -Wall -Wextra -Wpedantic'
         BUILDDIR = 'glove/build'
         SRCDIR = 'glove/src'
 

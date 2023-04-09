@@ -10,7 +10,7 @@ and the resulting representations showcase interesting linear substructures of t
 
 ### From source:
 ```bash
-$ git clone https://github.com/iconclub/python-glove
+$ git clone https://github.com/Infoboros/python-glove-infoboros.git
 $ cd python-glove
 $ python setup.py install
 ```
