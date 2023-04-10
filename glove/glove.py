@@ -120,6 +120,27 @@ class Glove:
         )
         self.print_log()
 
+    def get_train_log(self) -> [dict]:
+        def extern_iter_info(row):
+            splited_row_log = row.split()
+            iter = splited_row_log[4]
+            cost = splited_row_log[6]
+            return {
+                'iter': int(iter[:-1]),
+                'cost': float(cost)
+            }
+
+        with open(log) as f:
+            return list(
+                map(
+                    extern_iter_info,
+                    filter(
+                        lambda row: 'iter' in row,
+                        f.read().split('\n')
+                    )
+                )
+            )
+
     def get_log_pipe(self):
         return open(log, 'wb')
 
